@@ -20,7 +20,7 @@ because it won't compile back then. :-)
 
    **Build Windows Executable from Mac M1**
 
-   _Source:_ 
+   _Source:_ [Stack Overflow](https://stackoverflow.com/questions/67061283/compile-a-rust-program-to-an-exe-using-an-m1-mac)
 
    ```bash
    brew install mingw-w64
