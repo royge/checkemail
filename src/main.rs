@@ -1,27 +1,31 @@
+use regex::Regex;
 use std::env;
-use regex::{Regex, Error};
 use trust_dns_resolver::config::*;
-use trust_dns_resolver::Resolver;
 use trust_dns_resolver::error::ResolveError;
+use trust_dns_resolver::Resolver;
 
 fn get(email_address: &mut String) {
     let mut args = env::args();
     args.next();
 
     match args.next() {
-        Some(v) => { *email_address = v.to_string() },
-        None => {},
+        Some(v) => *email_address = v.to_string(),
+        None => {}
     }
 }
 
-fn validate_format(email_address: &String) -> Result<(), Error> {
+fn is_valid_email(email_address: &String) -> bool {
     // Honestly, I'm not a fan of regex but ChatGPT recommended this.
     // Regular expression to match email syntax
-    let email_regex = Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")?;
-    if !email_regex.is_match(email_address) {
-        return Err(Error::Syntax(String::from("Invalid email format")));
+    match Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$") {
+        Ok(email_regex) => {
+            if !email_regex.is_match(email_address) {
+                return false;
+            }
+        }
+        Err(_) => { return false; },
     }
-    Ok(())
+    true
 }
 
 fn validate_domain(email_address: &String) -> Result<(), ResolveError> {
@@ -36,11 +40,11 @@ fn validate_domain(email_address: &String) -> Result<(), ResolveError> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut email_address = String::new();
+
     get(&mut email_address);
 
-    if let Err(error) = validate_format(&email_address) {
-        eprintln!("{}", error);
-        return Err(Box::new(error));
+    if !is_valid_email(&email_address) {
+        return Err("Invalid email format!".into());
     }
 
     match validate_domain(&email_address) {
@@ -60,25 +64,25 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_validate_email() {
+    fn test_is_valid_email() {
         let input = String::from("user@example.com");
-        let res = validate_format(&input);
-        assert_eq!(Ok(()), res);
+        let res = is_valid_email(&input);
+        assert_eq!(true, res);
 
         let input = String::from("userexample.com");
-        let res = validate_format(&input);
-        assert_ne!(Ok(()), res);
+        let res = is_valid_email(&input);
+        assert_eq!(false, res);
 
         let input = String::from("user@examplecom");
-        let res = validate_format(&input);
-        assert_ne!(Ok(()), res);
+        let res = is_valid_email(&input);
+        assert_eq!(false, res);
 
         let input = String::from("userexamplecom");
-        let res = validate_format(&input);
-        assert_ne!(Ok(()), res);
+        let res = is_valid_email(&input);
+        assert_eq!(false, res);
 
         let input = String::from("");
-        let res = validate_format(&input);
-        assert_ne!(Ok(()), res);
+        let res = is_valid_email(&input);
+        assert_eq!(false, res);
     }
 }
