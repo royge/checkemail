@@ -12,3 +12,4 @@ Cargo.lock
 # VIM
 .*.swp
 .*.swo
+**/.*.swo
