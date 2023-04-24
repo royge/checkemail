@@ -18,7 +18,7 @@ because it won't compile back then. :-)
    cargo build --release
    ```
 
-   **Build Windows Executable from Mac M1**
+   **Build Windows Executable from Apple Silicon Mac**
 
    _Source:_ [Stack Overflow](https://stackoverflow.com/questions/67061283/compile-a-rust-program-to-an-exe-using-an-m1-mac)
 
@@ -27,6 +27,17 @@ because it won't compile back then. :-)
    rustup target add x86_64-pc-windows-gnu
    rustup toolchain install stable-x86_64-pc-windows-gnu
    cargo build --release --target=x86_64-pc-windows-gnu
+   ```
+
+   **Build Executable for Intel Mac from Apple Silicon Mac**
+
+   _Source:_ ChatGPT
+
+   ```bash
+   softwareupdate --install-rosetta
+   rustup target add x86_64-apple-darwin
+   export CARGO_HOME=$HOME/rust/cargo
+   cargo build --target=x86_64-apple-darwin
    ```
 
 ## How To Use
