@@ -8,13 +8,12 @@ fn get(email_address: &mut String) {
     let mut args = env::args();
     args.next();
 
-    match args.next() {
-        Some(v) => *email_address = v.to_string(),
-        None => {}
+    if let Some(v) = args.next() {
+        *email_address = v.to_string();
     }
 }
 
-fn is_valid_email(email_address: &String) -> bool {
+fn is_valid_email(email_address: &str) -> bool {
     // Honestly, I'm not a fan of regex but ChatGPT recommended this.
     // Regular expression to match email syntax
     match Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$") {
@@ -28,7 +27,7 @@ fn is_valid_email(email_address: &String) -> bool {
     true
 }
 
-fn validate_domain(email_address: &String) -> Result<(), ResolveError> {
+fn validate_domain(email_address: &str) -> Result<(), ResolveError> {
     let domain = email_address.split('@').nth(1).unwrap();
     let resolver = Resolver::new(ResolverConfig::default(), ResolverOpts::default())?;
     let mx_records = resolver.mx_lookup(domain);
